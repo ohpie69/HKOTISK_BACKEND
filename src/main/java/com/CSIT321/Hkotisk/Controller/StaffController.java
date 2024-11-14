@@ -10,6 +10,7 @@ import java.util.List;
 import com.CSIT321.Hkotisk.Constant.ResponseCode;
 import com.CSIT321.Hkotisk.Entity.ProductEntity;
 import com.CSIT321.Hkotisk.Exception.ProductCustomException;
+import com.CSIT321.Hkotisk.Repository.CartRepository;
 import com.CSIT321.Hkotisk.Repository.ProductRepository;
 import com.CSIT321.Hkotisk.Response.ProductResponse;
 import com.CSIT321.Hkotisk.Response.ServerResponse;
@@ -20,6 +21,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import com.CSIT321.Hkotisk.Entity.OrderEntity;
+
+import com.CSIT321.Hkotisk.Exception.OrderCustomException;
+
+import com.CSIT321.Hkotisk.Repository.OrderRepository;
+
+import com.CSIT321.Hkotisk.Response.Order;
+
+import com.CSIT321.Hkotisk.Response.ViewOrderResponse;
+
+
 
 @RestController
 @RequestMapping("/staff")
@@ -27,6 +39,12 @@ public class StaffController {
 
     @Autowired
     private ProductRepository prodRepo;
+
+    @Autowired
+    private OrderRepository ordRepo;
+
+    @Autowired
+    private CartRepository cartRepo;
 
     @GetMapping("/products/{category}")
     public ResponseEntity<List<ProductEntity>> getProductsByCategory(@PathVariable String category) {
@@ -112,6 +130,47 @@ public class StaffController {
             resp.setMessage(ResponseCode.DEL_SUCCESS_MESSAGE);
         } catch (Exception e) {
             throw new ProductCustomException("Unable to delete product details, please try again");
+        }
+        return new ResponseEntity<>(resp, HttpStatus.OK);
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<ViewOrderResponse> viewOrders() throws IOException {
+
+        ViewOrderResponse resp = new ViewOrderResponse();
+        try {
+            resp.setStatus(ResponseCode.SUCCESS_CODE);
+            resp.setMessage(ResponseCode.VIEW_SUCCESS_MESSAGE);
+            List<Order> orderList = new ArrayList<>();
+            List<OrderEntity> poList = ordRepo.findAll();
+            poList.forEach((po) -> {
+                Order ord = new Order();
+                ord.setOrderBy(po.getEmail());
+                ord.setOrderId(po.getOrderId());
+                ord.setOrderStatus(po.getOrderStatus());
+                ord.setProducts(cartRepo.findAllByOrderId(po.getOrderId()));
+                orderList.add(ord);
+            });
+            resp.setOrderlist(orderList);
+        } catch (Exception e) {
+            throw new OrderCustomException("Unable to retrieve orders, please try again");
+        }
+
+        return new ResponseEntity<ViewOrderResponse>(resp, HttpStatus.OK);
+    }
+
+    @PostMapping("/order")
+    public ResponseEntity<ServerResponse> updateOrders(@Valid @RequestBody OrderEntity orderDTO) throws IOException {
+        ServerResponse resp = new ServerResponse();
+        try {
+            OrderEntity pc = ordRepo.findByOrderId(orderDTO.getOrderId());
+            pc.setOrderStatus(orderDTO.getOrderStatus());
+            pc.setOrderDate(new Date(System.currentTimeMillis()));
+            ordRepo.save(pc);
+            resp.setStatus(ResponseCode.SUCCESS_CODE);
+            resp.setMessage(ResponseCode.UPD_ORD_SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            throw new OrderCustomException("Unable to retrieve orders, please try again");
         }
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
