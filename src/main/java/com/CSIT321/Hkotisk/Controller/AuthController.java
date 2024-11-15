@@ -150,4 +150,37 @@ public class AuthController {
         return new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
 
     }
+    @GetMapping("/role")
+    public ResponseEntity<ServerResponse> getRole(HttpServletRequest request) {
+        ServerResponse response = new ServerResponse();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+                response.setStatus(ResponseCode.FAILURE_CODE);
+                response.setMessage("No authenticated user found.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            String email = authentication.getName();
+            Optional<User> userOptional = userRepo.findByEmail(email);
+
+            if (userOptional.isEmpty()) {
+                response.setStatus(ResponseCode.FAILURE_CODE);
+                response.setMessage("User not found.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+            User user = userOptional.get();
+            String role = user.getRole();
+
+            response.setStatus(ResponseCode.SUCCESS_CODE);
+            response.setMessage("Role retrieved successfully");
+            response.setRole(role);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus(ResponseCode.FAILURE_CODE);
+            response.setMessage("An error occurred: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

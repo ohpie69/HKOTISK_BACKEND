@@ -35,7 +35,7 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/resources/**", "/static/**", "/public/**", "/auth/**", "/auth/signup", "/auth/signin", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/ws/**", "/topic/**").permitAll()
-                        .requestMatchers("/user/**", "/auth/signout", "/user/products", "/user/addToCart", "/user/cart", "/user/order").hasAnyAuthority("ROLE_STUDENT", "ROLE_STAFF")
+                        .requestMatchers("/user/**", "/auth/signout","/auth/role", "/user/products", "/user/addToCart", "/user/cart", "/user/order").hasAnyAuthority("ROLE_STUDENT", "ROLE_STAFF")
                         .requestMatchers("/staff/**", "/auth/signout", "/staff/product", "/staff/orders", "/staff/order").hasAuthority("ROLE_STAFF")
                         .anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

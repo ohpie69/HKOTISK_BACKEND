@@ -11,6 +11,8 @@ import com.CSIT321.Hkotisk.Entity.OrderEntity;
 import com.CSIT321.Hkotisk.Entity.ProductEntity;
 import com.CSIT321.Hkotisk.Exception.OrderCustomException;
 import com.CSIT321.Hkotisk.Exception.ProductCustomException;
+import com.CSIT321.Hkotisk.Handler.OrderWebSocketHandler;
+import com.CSIT321.Hkotisk.Handler.ProductWebSocketHandler;
 import com.CSIT321.Hkotisk.Repository.CartRepository;
 import com.CSIT321.Hkotisk.Repository.OrderRepository;
 import com.CSIT321.Hkotisk.Repository.ProductRepository;
@@ -78,6 +80,8 @@ public class StaffController {
             resp.setStatus(ResponseCode.SUCCESS_CODE);
             resp.setMessage(ResponseCode.ADD_SUCCESS_MESSAGE);
             resp.setOblist(prodRepo.findAll());
+
+            ProductWebSocketHandler.sendMessageToAll("New Item added: ");
         } catch (Exception e) {
             e.printStackTrace(); // Log the exception for debugging
             throw new ProductCustomException("Unable to save product details, please try again");
@@ -101,6 +105,8 @@ public class StaffController {
             prodRepo.save(prod);
             resp.setStatus(ResponseCode.SUCCESS_CODE);
             resp.setMessage(ResponseCode.UPD_SUCCESS_MESSAGE);
+
+            ProductWebSocketHandler.sendMessageToAll("New Item updated: ");
         } catch (Exception e) {
             throw new ProductCustomException("Unable to update product details, please try again");
         }
@@ -114,6 +120,8 @@ public class StaffController {
             prodRepo.deleteByProductId(productId);
             resp.setStatus(ResponseCode.SUCCESS_CODE);
             resp.setMessage(ResponseCode.DEL_SUCCESS_MESSAGE);
+
+            ProductWebSocketHandler.sendMessageToAll("New Item added: ");
         } catch (Exception e) {
             throw new ProductCustomException("Unable to delete product details, please try again");
         }
