@@ -63,14 +63,6 @@ public class UserController extends TextWebSocketHandler {
         ProductEntity products = prodRepo.findByProductId(id);
         return ResponseEntity.ok(products);
     }
-    @GetMapping("/products/quantity/{id}")
-    public ResponseEntity<Integer> getProductQuantityById(@PathVariable int id) {
-        ProductEntity product = prodRepo.findByProductId(id);
-        if (product != null) {
-            return ResponseEntity.ok(product.getQuantity());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 
 }

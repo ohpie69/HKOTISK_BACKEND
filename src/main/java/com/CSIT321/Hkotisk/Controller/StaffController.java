@@ -1,4 +1,3 @@
-
 package com.CSIT321.Hkotisk.Controller;
 
 import java.io.IOException;
@@ -8,28 +7,22 @@ import java.util.Date;
 import java.util.List;
 
 import com.CSIT321.Hkotisk.Constant.ResponseCode;
+import com.CSIT321.Hkotisk.Entity.OrderEntity;
 import com.CSIT321.Hkotisk.Entity.ProductEntity;
+import com.CSIT321.Hkotisk.Exception.OrderCustomException;
 import com.CSIT321.Hkotisk.Exception.ProductCustomException;
 import com.CSIT321.Hkotisk.Repository.CartRepository;
+import com.CSIT321.Hkotisk.Repository.OrderRepository;
 import com.CSIT321.Hkotisk.Repository.ProductRepository;
+import com.CSIT321.Hkotisk.Response.Order;
 import com.CSIT321.Hkotisk.Response.ProductResponse;
 import com.CSIT321.Hkotisk.Response.ServerResponse;
+import com.CSIT321.Hkotisk.Response.ViewOrderResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
-import com.CSIT321.Hkotisk.Entity.OrderEntity;
-
-import com.CSIT321.Hkotisk.Exception.OrderCustomException;
-
-import com.CSIT321.Hkotisk.Repository.OrderRepository;
-
-import com.CSIT321.Hkotisk.Response.Order;
-
-import com.CSIT321.Hkotisk.Response.ViewOrderResponse;
 
 
 
@@ -57,16 +50,6 @@ public class StaffController {
         return ResponseEntity.ok(product);
     }
 
-    @GetMapping("/products/quantity/{id}")
-    public ResponseEntity<Integer> getProductQuantityById(@PathVariable int id) {
-        ProductEntity product = prodRepo.findByProductId(id);
-        if (product != null) {
-            return ResponseEntity.ok(product.getQuantity());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 
     @PostMapping("/product")
     public ResponseEntity<ProductResponse> addProduct(@Valid @RequestBody ProductEntity input) throws IOException {
@@ -80,6 +63,10 @@ public class StaffController {
             }
             prod.setProductName(input.getProductName());
             prod.setQuantity(input.getQuantity());
+            if (input.getQuantity() != null) {
+                prod.setQuantity(Arrays.stream(input.getQuantity()).toArray());
+            }
+
             if (input.getSizes() != null) {
                 prod.setSizes(Arrays.stream(input.getSizes()).map(String::toUpperCase).toArray(String[]::new));
             }
@@ -97,7 +84,6 @@ public class StaffController {
         }
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
-
 
     @PutMapping("/product")
     public ResponseEntity<ServerResponse> updateProducts(@Valid @RequestBody ProductEntity productDTO) throws IOException {
@@ -174,6 +160,4 @@ public class StaffController {
         }
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
-
-
 }
