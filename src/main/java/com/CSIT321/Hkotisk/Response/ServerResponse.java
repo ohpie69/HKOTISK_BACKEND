@@ -10,7 +10,4 @@ public class ServerResponse {
     private String message;
     private String authToken;
     private String role;
-
-
-
 }
