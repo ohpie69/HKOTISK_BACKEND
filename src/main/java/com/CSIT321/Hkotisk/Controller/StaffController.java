@@ -87,24 +87,24 @@ public class StaffController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @PutMapping("/product")
-    public ResponseEntity<ServerResponse> updateProducts(@Valid @RequestBody ProductEntity productDTO) throws IOException {
+    @PutMapping("/product/{id}")
+    public ResponseEntity<ServerResponse> updateProducts(@PathVariable int id, @Valid @RequestBody ProductEntity productDTO) throws IOException {
         ServerResponse resp = new ServerResponse();
         try {
             ProductEntity prod;
             if (productDTO.getProductImage() != null) {
-                prod = new ProductEntity(productDTO.getProductId(), productDTO.getDescription(), productDTO.getProductName(),
+                prod = new ProductEntity(id, productDTO.getDescription(), productDTO.getProductName(),
                         productDTO.getPrices(), productDTO.getQuantity(), productDTO.getSizes(), productDTO.getCategory(), productDTO.getProductImage());
             } else {
-                ProductEntity prodOrg = prodRepo.findByProductId(productDTO.getProductId());
-                prod = new ProductEntity(productDTO.getProductId(), productDTO.getDescription(), productDTO.getProductName(),
+                ProductEntity prodOrg = prodRepo.findByProductId(id);
+                prod = new ProductEntity(id, productDTO.getDescription(), productDTO.getProductName(),
                         productDTO.getPrices(), productDTO.getQuantity(), productDTO.getSizes(), productDTO.getCategory(), prodOrg.getProductImage());
             }
             prodRepo.save(prod);
             resp.setStatus(ResponseCode.SUCCESS_CODE);
-            resp.setMessage(ResponseCode.UPD_SUCCESS_MESSAGE);
+            resp.setMessage("Product with ID " + id + " updated successfully");
 
-            ProductWebSocketHandler.sendMessageToAll("New Item updated: ");
+            ProductWebSocketHandler.sendMessageToAll("Product with ID " + id + " updated");
         } catch (Exception e) {
             throw new ProductCustomException("Unable to update product details, please try again");
         }
