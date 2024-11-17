@@ -73,9 +73,7 @@ public class StaffController {
                 prod.setSizes(Arrays.stream(input.getSizes()).map(String::toUpperCase).toArray(String[]::new));
             }
             prod.setCategory(input.getCategory());
-            if (input.getProductImage() != null) {
-                prod.setProductImage(input.getProductImage());
-            }
+            prod.setProductImage(input.getProductImage());
             prodRepo.save(prod);
             resp.setStatus(ResponseCode.SUCCESS_CODE);
             resp.setMessage(ResponseCode.ADD_SUCCESS_MESSAGE);

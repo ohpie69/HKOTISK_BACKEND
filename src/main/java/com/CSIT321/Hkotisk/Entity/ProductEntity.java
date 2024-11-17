@@ -33,8 +33,8 @@ public class ProductEntity implements Serializable {
     @NotBlank(message = "Category is mandatory")
     private String category;
 
-    @Lob
-    private byte[] productImage;
+    @NotBlank(message = "Product Image is mandatory")
+    private String productImage;
 
     public double getPriceForSize(String size) {
         if (sizes != null && prices != null) {
